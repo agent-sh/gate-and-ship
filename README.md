@@ -33,6 +33,8 @@ claude mcp add-json gate-and-ship '{"type":"url","url":"https://github.com/agent
 
 **Step 2** - Runs `/ship` (PR creation, CI monitoring, merge)
 
+`--base` is forwarded to both steps. `--skip-review` and `--skip-docs` are forwarded to Step 1 only.
+
 If Step 1 fails, Step 2 does not run.
 
 ## Composability
