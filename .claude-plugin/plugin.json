@@ -1,0 +1,19 @@
+{
+  "name": "gate-and-ship",
+  "version": "0.1.0",
+  "description": "Quality gates then ship - chains /prepare-delivery and /ship",
+  "author": {
+    "name": "Avi Fenesh",
+    "email": "[email protected]",
+    "url": "https://github.com/avifenesh"
+  },
+  "homepage": "https://github.com/agent-sh/gate-and-ship",
+  "repository": "https://github.com/agent-sh/gate-and-ship",
+  "license": "MIT",
+  "keywords": [
+    "orchestrator",
+    "delivery-pipeline",
+    "quality-gates",
+    "automation"
+  ]
+}
