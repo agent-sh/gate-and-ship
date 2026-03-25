@@ -4,34 +4,18 @@
 
 ## Commands
 
-- gate-and-ship
+- **gate-and-ship** [--base=BRANCH] [--skip-review] [--skip-docs] - runs /prepare-delivery quality gates then /ship for PR + merge
 
 ## Critical Rules
 
-1. **Plain text output** - No emojis, no ASCII art. Use `[OK]`, `[ERROR]`, `[WARN]`, `[CRITICAL]` for status markers.
-2. **No unnecessary files** - Don't create summary files, plan files, audit files, or temp docs.
-3. **Task is not done until tests pass** - Every feature/fix must have quality tests.
-4. **Create PRs for non-trivial changes** - No direct pushes to main.
-5. **Always run git hooks** - Never bypass pre-commit or pre-push hooks.
-6. **Use single dash for em-dashes** - In prose, use ` - ` (single dash with spaces), never ` -- `.
-7. **Report script failures before manual fallback** - Never silently bypass broken tooling.
+1. **Plain text output** - Use `[OK]`, `[ERROR]`, `[WARN]`, `[CRITICAL]` for status markers.
+2. **Only create necessary files** - Keep the working tree clean, only deliverables and tests.
+3. **Task is not done until tests pass** - Delegated to prepare-delivery's delivery-validator.
+4. **Create PRs for non-trivial changes** - Handled by ship:ship.
+5. **Always run git hooks** - Verify hooks are installed before push.
+6. **Use single dash for em-dashes** - In prose, use ` - ` (single dash with spaces).
+7. **Report script failures with exact error output** - Diagnose before attempting workarounds.
 8. **Token efficiency** - Save tokens over decorations.
-
-## Model Selection
-
-| Model | When to Use |
-|-------|-------------|
-| **Opus** | Complex reasoning, analysis, planning |
-| **Sonnet** | Validation, pattern matching, most agents |
-| **Haiku** | Mechanical execution, no judgment needed |
-
-## Core Priorities
-
-1. User DX (plugin users first)
-2. Worry-free automation
-3. Token efficiency
-4. Quality output
-5. Simplicity
 
 ## Cross-Plugin Dependencies
 
@@ -39,6 +23,10 @@
 |------|--------|---------------|
 | Quality gates | prepare-delivery | `prepare-delivery:prepare-delivery` |
 | Ship | ship | `ship:ship` |
+
+## Stateless Plugin
+
+This plugin is stateless - it delegates all state management to prepare-delivery and ship. No agents, no skills, one command.
 
 ## References
 
