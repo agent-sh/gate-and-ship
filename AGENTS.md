@@ -33,6 +33,13 @@
 4. Quality output
 5. Simplicity
 
+## Cross-Plugin Dependencies
+
+| Step | Plugin | Command/Skill |
+|------|--------|---------------|
+| Quality gates | prepare-delivery | `prepare-delivery:prepare-delivery` |
+| Ship | ship | `ship:ship` |
+
 ## References
 
 - Part of the [agentsys](https://github.com/agent-sh/agentsys) ecosystem

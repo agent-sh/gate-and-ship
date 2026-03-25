@@ -49,17 +49,17 @@ if (BASE_BRANCH) {
   shipArgs.push(`--base ${BASE_BRANCH}`);
 }
 
-// Pass flow state if next-task is installed
+// Pass flow state if available
 try {
-  const { getPluginRoot } = require('./lib/cross-platform');
+  const fs = require('fs');
   const path = require('path');
-  const pluginRoot = getPluginRoot('next-task');
-  if (pluginRoot) {
-    const workflowState = require(path.join(pluginRoot, 'lib/state/workflow-state.js'));
-    const flowPath = workflowState.getFlowPath();
+  const cwd = process.cwd();
+  const stateDir = ['.claude', '.opencode', '.codex'].find(d => fs.existsSync(path.join(cwd, d))) || '.claude';
+  const flowPath = path.join(cwd, stateDir, 'flow.json');
+  if (fs.existsSync(flowPath)) {
     shipArgs.push(`--state-file "${flowPath}"`);
   }
-} catch (e) { /* next-task not installed */ }
+} catch (e) { /* no flow state */ }
 
 await Skill({ name: "ship:ship", args: shipArgs.join(' ') });
 ```
