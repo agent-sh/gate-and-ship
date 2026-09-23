@@ -5,100 +5,31 @@ argument-hint: "[--base=BRANCH] [--skip-review] [--skip-docs]"
 allowed-tools: Bash(git:*), Bash(gh:*), Bash(npm:*), Bash(node:*), Read, Write, Edit, Glob, Grep, Task, Skill, AskUserQuestion
 ---
 
-# /gate-and-ship - Quality Gates + Ship
+# /gate-and-ship
 
-Chains `/prepare-delivery` (quality gates) then `/ship` (PR + merge).
-Single command to go from finished implementation to merged PR.
+Take a finished branch through the quality gates and, only if they pass, ship it: `/prepare-delivery`, then `/ship`.
 
----
+Arguments: `$ARGUMENTS`
 
-## Arguments
+- `--base=BRANCH`: base branch for the gates and the PR target. Default: the remote default branch, else `main`.
+- `--skip-review`: skip the review loop in the gates.
+- `--skip-docs`: skip docs sync in the gates.
 
-All arguments are forwarded to `/prepare-delivery`:
-- `--base=BRANCH`: Override the base branch (default: auto-detect or `main`)
-- `--skip-review`: Skip the review loop
-- `--skip-docs`: Skip docs sync
+## Gates
 
-## Step 1: Prepare Delivery
+Run the `prepare-delivery:prepare-delivery` skill with all the arguments. It ends with a `=== PREPARE_DELIVERY_RESULT ===` block. If the Skill tool is missing, read the prepare-delivery plugin's `skills/prepare-delivery/SKILL.md` and run it inline.
 
-Run all quality gates via `/prepare-delivery`.
+Ship only when `readyToShip` is true. Otherwise stop, show the gate report and the fix instructions, and tell the user to fix and run `/gate-and-ship` again. Shipping a branch the gates rejected is the one outcome this command exists to prevent.
 
-```javascript
-const args = '$ARGUMENTS';
-console.log('[OK] Step 1: Running prepare-delivery...');
-await Skill({ name: "prepare-delivery:prepare-delivery", args });
-```
+## Ship
 
-If prepare-delivery fails, stop here. Do not proceed to ship.
+Run the `ship:ship` skill with:
 
-## Step 2: Ship
+- `--base <BRANCH>` when `--base=BRANCH` was given (ship takes the value as a separate word).
+- `--state-file <path>` when `{stateDir}/flow.json` exists and its `git.branch` is the current branch. The gates just wrote it, and it tells ship that review, deslop and docs already ran, so it skips its own review pass. A flow for another branch belongs to someone else's `/next-task` run: do not pass it. `{stateDir}` is `$AI_STATE_DIR` when set, else `.opencode`, `.codex` or `.claude` at the repo root, whichever the gates wrote to.
 
-Hand off to `ship:ship` for PR creation, CI monitoring, and merge.
+If ship is not installed, stop after the gates, say the branch is ready, and suggest `/ship` or opening the PR by hand.
 
-```javascript
-console.log('[OK] Step 2: Handing off to ship:ship...');
+## Done
 
-// Parse --base from args for ship
-const argList = args.split(' ').filter(Boolean);
-const baseArg = argList.find(a => a.startsWith('--base='));
-const BASE_BRANCH = baseArg ? baseArg.split('=')[1] : null;
-
-// Build ship args
-const shipArgs = [];
-if (BASE_BRANCH) {
-  shipArgs.push(`--base ${BASE_BRANCH}`);
-}
-
-// Pass flow state if available
-try {
-  const fs = require('fs');
-  const path = require('path');
-  const cwd = process.cwd();
-  const stateDir = ['.claude', '.opencode', '.codex'].find(d => fs.existsSync(path.join(cwd, d))) || '.claude';
-  const flowPath = path.join(cwd, stateDir, 'flow.json');
-  if (fs.existsSync(flowPath)) {
-    shipArgs.push(`--state-file "${flowPath}"`);
-  }
-} catch (e) { /* no flow state */ }
-
-await Skill({ name: "ship:ship", args: shipArgs.join(' ') });
-```
-
-## Error Handling
-
-```javascript
-try {
-  // Step 1: prepare-delivery
-  // Step 2: ship:ship
-} catch (error) {
-  console.log(`[ERROR] Failed: ${error.message}`);
-  console.log('Fix the issue and run /gate-and-ship again, or run /prepare-delivery and /ship separately.');
-}
-```
-
-## Examples
-
-```bash
-# Full: quality gates + ship
-/gate-and-ship
-
-# Against a specific base branch
-/gate-and-ship --base=develop
-
-# Skip review, still ship
-/gate-and-ship --skip-review
-
-# Combine flags
-/gate-and-ship --base=develop --skip-docs
-```
-
-## Composability
-
-```
-/gate-and-ship = /prepare-delivery + /ship
-```
-
-Each can be run independently:
-- `/prepare-delivery` - run quality gates only, decide later whether to ship
-- `/ship` - ship directly if you've already reviewed and validated
-- `/gate-and-ship` - do both in sequence
+Either the gates rejected the branch and the user has the reasons, or ship ran and its report is the last thing in the reply. Report which step failed if one did, and that `/prepare-delivery` and `/ship` can be run on their own.
