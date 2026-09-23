@@ -7,12 +7,10 @@ Part of the [agentsys](https://github.com/agent-sh/agentsys) ecosystem.
 ## Installation
 
 ```bash
-# Via agentsys (recommended)
-claude plugin marketplace add agent-sh/agentsys
-
-# Standalone
-claude mcp add-json gate-and-ship '{"type":"url","url":"https://github.com/agent-sh/gate-and-ship.git"}'
+agentsys install gate-and-ship
 ```
+
+Or add the marketplace in Claude Code with `claude plugin marketplace add agent-sh/agentsys` and install `gate-and-ship` from it.
 
 ## Usage
 
@@ -35,7 +33,7 @@ claude mcp add-json gate-and-ship '{"type":"url","url":"https://github.com/agent
 
 `--base` is forwarded to both steps. `--skip-review` and `--skip-docs` are forwarded to Step 1 only.
 
-If Step 1 fails, Step 2 does not run.
+Step 2 runs only when Step 1 reports `readyToShip`. When the gates wrote a flow state for the current branch, it is passed to `/ship` as `--state-file`, so ship does not run a second internal review. A flow state from another branch is never passed. Without the ship plugin, the command stops after the gates.
 
 ## Composability
 

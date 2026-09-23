@@ -1,6 +1,6 @@
 {
   "name": "@agentsys/gate-and-ship",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Quality gates then ship - chains /prepare-delivery and /ship",
   "author": {
     "name": "Avi Fenesh",
