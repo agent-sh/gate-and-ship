@@ -32,3 +32,12 @@ This plugin is stateless - it delegates all state management to prepare-delivery
 
 - Part of the [agentsys](https://github.com/agent-sh/agentsys) ecosystem
 - https://agentskills.io
+
+## Validation scope
+
+Choose checks that cover the changed behavior. For CPU-only tooling, documentation
+and configuration changes, run the relevant CPU tests, static checks and configuration
+validation. Do not require a blanket GPU gate for those changes. Require GPU
+qualification when GPU, runtime or model behavior, or related claims, change.
+Preserve applicable native, model and hardware qualification gates. CPU checks do
+not qualify GPU behavior.
