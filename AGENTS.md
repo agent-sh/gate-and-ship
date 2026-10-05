@@ -2,42 +2,29 @@
 
 > Quality gates then ship - chains /prepare-delivery and /ship
 
-## Commands
+## Overview
 
-- **gate-and-ship** [--base=BRANCH] [--skip-review] [--skip-docs] - runs /prepare-delivery quality gates then /ship for PR + merge
+One command, no agents, no skills, no state of its own. `/gate-and-ship [--base=BRANCH] [--skip-review] [--skip-docs]` runs the prepare-delivery quality gates and, only when they report `readyToShip`, runs ship for the PR and merge. State lives in those two plugins.
 
-## Critical Rules
-
-1. **Plain text output** - Use `[OK]`, `[ERROR]`, `[WARN]`, `[CRITICAL]` for status markers.
-2. **Only create necessary files** - Keep the working tree clean, only deliverables and tests.
-3. **Task is not done until tests pass** - Delegated to prepare-delivery's delivery-validator.
-4. **Create PRs for non-trivial changes** - Handled by ship:ship.
-5. **Always run git hooks** - Verify hooks are installed before push.
-6. **Use single dash for em-dashes** - In prose, use ` - ` (single dash with spaces).
-7. **Report script failures with exact error output** - Diagnose before attempting workarounds.
-8. **Token efficiency** - Save tokens over decorations.
-
-## Cross-Plugin Dependencies
-
-| Step | Plugin | Command/Skill |
-|------|--------|---------------|
+| Step | Plugin | Skill |
+|------|--------|-------|
 | Quality gates | prepare-delivery | `prepare-delivery:prepare-delivery` |
 | Ship | ship | `ship:ship` |
 
-## Stateless Plugin
+The command reads the `=== PREPARE_DELIVERY_RESULT ===` block from prepare-delivery and passes `--base` and `--state-file` to ship, so a change to either plugin's interface needs a matching change here.
 
-This plugin is stateless - it delegates all state management to prepare-delivery and ship. No agents, no skills, one command.
+## Checks
+
+No tests or CI in this repo. Run `agnix .` after editing the command or this file.
+
+## Conventions
+
+- Output is plain text with the status markers `[OK]`, `[ERROR]`, `[WARN]`, `[CRITICAL]`.
+- In prose, write a spaced single dash (` - `), not ` -- ` or an em dash.
+- Keep the working tree to deliverables; tests run in prepare-delivery's validator.
+- When a step fails, report its exact error output and diagnose before working around it.
 
 ## References
 
 - Part of the [agentsys](https://github.com/agent-sh/agentsys) ecosystem
 - https://agentskills.io
-
-## Validation scope
-
-Choose checks that cover the changed behavior. For CPU-only tooling, documentation
-and configuration changes, run the relevant CPU tests, static checks and configuration
-validation. Do not require a blanket GPU gate for those changes. Require GPU
-qualification when GPU, runtime or model behavior, or related claims, change.
-Preserve applicable native, model and hardware qualification gates. CPU checks do
-not qualify GPU behavior.

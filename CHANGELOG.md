@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- AGENTS.md trimmed for current models: dropped the GPU validation text and the rules that only restated what prepare-delivery and ship handle, added an Overview with the interface this command depends on, and named `agnix .` as the check. The command is unchanged; it was rewritten for current models in 0.2.0.
+
 ## [0.2.0] - 2026-09-24
 
 ### Changed
